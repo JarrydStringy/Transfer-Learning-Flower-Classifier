@@ -8,11 +8,12 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications import imagenet_utils
 import os
 
+# Define dataset location
+img_path = os.path.join(os.path.dirname(__file__),
+                        '../small_flower_dataset/')
+
 
 def PrepareImage(file):
-    img_path = os.path.join(os.path.dirname(__file__),
-                            '../small_flower_dataset/')
-
     # MobileNet expects 224x224 image sizes
     img = image.load_img(img_path + file, target_size=(224, 224))
     img_array = image.img_to_array(img)
@@ -36,7 +37,6 @@ if __name__ == "__main__":
     print("Flower Classifier by Jarryd Stringfellow and Chase Dart")
 
     # Retrieve MobileNetV2 Data
-    # mobile = tf.keras.applications.mobilenet_v2.MobileNetV2()
     mobile = tf.keras.applications.mobilenet_v2.MobileNetV2(
         input_shape=None,
         alpha=1.0,
@@ -55,6 +55,16 @@ if __name__ == "__main__":
     # file = 'tulips/11746276_de3dec8201.jpg'
 
     # New()
+
+    images = []  # All images
+    group = []  # Type of flower
+
+    # Record the different groups
+    for path, subdirs, files in os.walk(img_path):
+        for name in subdirs:
+            group += [name]
+
+    print(group)
 
     preprocessed_image = PrepareImage(file)
 
