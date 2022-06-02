@@ -6,36 +6,26 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import os
+image_path = "/"  # Init for global path var
 
-# Task 1: Global declaration of filepath to dataset
-image_path = os.path.join(os.path.dirname(__file__),
-                          '../small_flower_dataset/')
+
+def task_1():
+    """
+    Download the small flower dataset from Blackboard.
+    Global declaration of filepath to dataset
+    """
+    global image_path
+    image_path = os.path.join(os.path.dirname(__file__),
+                              '../small_flower_dataset/')
 
 
 def task_2():
     """
     Using the tf.keras.applications module download a pretrained MobileNetV2 network.
     """
-    images = ()  # All images
-    categories = []  # Type of flower
-
-    # Record the different groups
-    for path, subdirs, files in os.walk(image_path):
-        for name in subdirs:
-            categories += [name]
-
-    # print(group)
-
-    # Record the images
-    for file in os.listdir(image_path + "daisy/"):
-        temp_tuple = (file, 'null')
-        images += temp_tuple
-        images = images[:-1]  # Remove null
-
-    # print(images)
-
     # Retrieve MobileNetV2 Data
-    mobile = tf.keras.applications.mobilenet_v2.MobileNetV2()
+    mobile = tf.keras.applications.mobilenet_v2.MobileNetV2()  # Needs to be like below
+
     # mobile = tf.keras.applications.mobilenet_v2.MobileNetV2(
     #     input_shape=None,
     #     alpha=1.0,
@@ -47,18 +37,7 @@ def task_2():
     #     classifier_activation='softmax'
     # )
 
-    # Cycle through all of the images
-    for category in categories:
-        for picture in images:
-
-            file = category + "/" + picture
-
-            preprocessed_image = task_4(file)
-            predictions = mobile.predict(preprocessed_image)
-            # Returns top 5 predictions
-            results = imagenet_utils.decode_predictions(predictions)
-
-            print(results)
+    return mobile
 
 
 def task_3():
@@ -66,6 +45,13 @@ def task_3():
     Replace the last layer with a Dense layer of the appropriate shape given that there are 5
     classes in the small flower dataset.
     """
+    layer = keras.layers.Dense(3)
+
+    layer.build((None, 5))  # Create the weights
+
+    print("weights:", len(layer.weights))
+    print("trainable_weights:", len(layer.trainable_weights))
+    print("non_trainable_weights:", len(layer.non_trainable_weights))
 
 
 def task_4(file):
@@ -82,12 +68,44 @@ def task_4(file):
     return tf.keras.applications.mobilenet_v2.preprocess_input(img_array_expanded_dims)
 
 
-def task_5():
+def task_5(mobile):
     """
     Compile and train your model with an SGD3
     optimizer using the following parameters
     learning_rate=0.01, momentum=0.0, nesterov=False.
     """
+
+    pictures = ()  # All images
+    categories = []  # Type of flower
+
+    # Record the different groups
+    for path, subdirs, files in os.walk(image_path):
+        for name in subdirs:
+            categories += [name]
+
+    # print(categories)
+
+    # Record the pictures
+    for category in categories:
+        for file in os.listdir(image_path + category + '/'):
+            temp_tuple = (file, 'null')
+            pictures += temp_tuple
+            pictures = pictures[:-1]  # Remove null
+
+    # print(pictures)
+
+    # Cycle through all of the pictures
+    for category in categories:
+        for picture in pictures:
+
+            file = category + "/" + picture
+
+            preprocessed_image = task_4(file)
+            predictions = mobile.predict(preprocessed_image)
+            # Returns top 5 predictions
+            results = imagenet_utils.decode_predictions(predictions)
+
+            print(results)
 
 
 def task_6():
@@ -112,19 +130,6 @@ def task_8():
     """
 
 
-def New():
-    """
-    Testing
-    """
-    layer = keras.layers.Dense(3)
-
-    layer.build((None, 5))  # Create the weights
-
-    print("weights:", len(layer.weights))
-    print("trainable_weights:", len(layer.trainable_weights))
-    print("non_trainable_weights:", len(layer.non_trainable_weights))
-
-
 if __name__ == "__main__":
     """
     Main function
@@ -133,12 +138,11 @@ if __name__ == "__main__":
     print("Flower Classifier by Jarryd Stringfellow and Chase Dart")
     print("========================================================")
 
-    task_2()
-    task_3()
-    task_4()
-    task_5()
+    task_1()
+    mobile = task_2()
+    # task_3() # Testing
+    # task_4() # Called from within task_5()
+    task_5(mobile)
     task_6()
     task_7()
     task_8()
-
-    # New()
