@@ -4,9 +4,8 @@ from tensorflow.keras.preprocessing import image
 from tensorflow import keras
 import tensorflow as tf
 import numpy as np
-from PIL import Image
 import os
-image_path = "/"  # Init for global path var
+image_path = "/"  # Init for global path var with empty path
 
 
 def task_1():
@@ -24,18 +23,16 @@ def task_2():
     Using the tf.keras.applications module download a pretrained MobileNetV2 network.
     """
     # Retrieve MobileNetV2 Data
-    mobile = tf.keras.applications.mobilenet_v2.MobileNetV2()  # Needs to be like below
-
-    # mobile = tf.keras.applications.mobilenet_v2.MobileNetV2(
-    #     input_shape=None,
-    #     alpha=1.0,
-    #     include_top=False,
-    #     weights='imagenet',
-    #     input_tensor=None,
-    #     pooling=None,
-    #     classes=1000,
-    #     classifier_activation='softmax'
-    # )
+    mobile = tf.keras.applications.mobilenet_v2.MobileNetV2(
+        input_shape=None,
+        alpha=1.0,
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        pooling=None,
+        classes=1000,
+        classifier_activation='softmax'
+    )
 
     return mobile
 
@@ -77,13 +74,12 @@ def task_5(mobile):
 
     pictures = ()  # All images
     categories = []  # Type of flower
+    qty = 0  # Quantity of images in each folder
 
     # Record the different groups
     for path, subdirs, files in os.walk(image_path):
         for name in subdirs:
             categories += [name]
-
-    # print(categories)
 
     # Record the pictures
     for category in categories:
@@ -91,13 +87,10 @@ def task_5(mobile):
             temp_tuple = (file, 'null')
             pictures += temp_tuple
             pictures = pictures[:-1]  # Remove null
+            qty += 1
 
-    # print(pictures)
-
-    # Cycle through all of the pictures
-    for category in categories:
+        # Cycle through all of the pictures
         for picture in pictures:
-
             file = category + "/" + picture
 
             preprocessed_image = task_4(file)
@@ -106,6 +99,8 @@ def task_5(mobile):
             results = imagenet_utils.decode_predictions(predictions)
 
             print(results)
+
+        pictures = ()
 
 
 def task_6():
