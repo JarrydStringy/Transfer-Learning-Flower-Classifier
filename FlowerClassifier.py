@@ -5,6 +5,8 @@ from tensorflow import keras
 import tensorflow as tf
 import numpy as np
 import os
+import matplotlib.pyplot as plt
+
 image_path = "/"  # Init for global path var with empty path
 
 
@@ -23,10 +25,10 @@ def task_2():
     Using the tf.keras.applications module download a pretrained MobileNetV2 network.
     """
     # Retrieve MobileNetV2 Data
-    mobile = tf.keras.applications.mobilenet_v2.MobileNetV2(
+    base_model = tf.keras.applications.mobilenet_v2.MobileNetV2(
         input_shape=None,
         alpha=1.0,
-        include_top=True,
+        # include_top=False,
         weights='imagenet',
         input_tensor=None,
         pooling=None,
@@ -34,21 +36,26 @@ def task_2():
         classifier_activation='softmax'
     )
 
-    return mobile
+    # Freeze the base_model
+    base_model.trainable = False
+
+    return base_model
 
 
-def task_3():
+def task_3(base_model):
     """
     Replace the last layer with a Dense layer of the appropriate shape given that there are 5
     classes in the small flower dataset.
     """
-    layer = keras.layers.Dense(3)
+    inputs = keras.Input(shape=(224, 224, 5))
+    # Change base_model to run in inference mode
+    x = base_model(inputs, training=False)
+    # Convert features of shape `base_model.output_shape[1:]` to vectors
+    x = keras.layers.GlobalAveragePooling2D()(x)
+    outputs = keras.layers.Dense(5)(x)
+    model = keras.Model(inputs, outputs)
 
-    layer.build((None, 5))  # Create the weights
-
-    print("weights:", len(layer.weights))
-    print("trainable_weights:", len(layer.trainable_weights))
-    print("non_trainable_weights:", len(layer.non_trainable_weights))
+    return model
 
 
 def task_4(file):
@@ -65,7 +72,7 @@ def task_4(file):
     return tf.keras.applications.mobilenet_v2.preprocess_input(img_array_expanded_dims)
 
 
-def task_5(mobile):
+def task_5(model):
     """
     Compile and train your model with an SGD3
     optimizer using the following parameters
@@ -94,7 +101,7 @@ def task_5(mobile):
             file = category + "/" + picture
 
             preprocessed_image = task_4(file)
-            predictions = mobile.predict(preprocessed_image)
+            predictions = model.predict(preprocessed_image)
             # Returns top 5 predictions
             results = imagenet_utils.decode_predictions(predictions)
 
@@ -102,12 +109,21 @@ def task_5(mobile):
 
         pictures = ()
 
+        # model.compile(optimizer=keras.optimizers.Adam(),
+        #               loss=keras.losses.BinaryCrossentropy(
+        #                   from_logits=True),
+        #               metrics=[keras.metrics.BinaryAccuracy()])
+
+        # model.fit(preprocessed_image, epochs=20,
+        #           callbacks=..., validation_data=...)
+
 
 def task_6():
     """
     Plot the training and validation errors vs time as well as the training and validation
     accuracies.
     """
+    # plt.plot()
 
 
 def task_7():
@@ -134,10 +150,10 @@ if __name__ == "__main__":
     print("========================================================")
 
     task_1()
-    mobile = task_2()
-    # task_3() # Testing
+    base_model = task_2()
+    # model = task_3(base_model)
     # task_4() # Called from within task_5()
-    task_5(mobile)
+    task_5(base_model)  # Change to model to use task_3
     task_6()
     task_7()
     task_8()
