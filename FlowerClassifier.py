@@ -1,15 +1,19 @@
 # Imports PIL module
+from email.mime import base
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import ConfusionMatrixDisplay
 from tensorflow.keras.applications import imagenet_utils
 from tensorflow.keras.preprocessing import image
 from tensorflow import keras
 import tensorflow as tf
 import numpy as np
+from imageio import imread
 import os
 import matplotlib.pyplot as plt
 
 image_path = "/"  # Init for global path var with empty path
-
-
+    
 def task_1():
     """
     Download the small flower dataset from Blackboard.
@@ -17,7 +21,7 @@ def task_1():
     """
     global image_path
     image_path = os.path.join(os.path.dirname(__file__),
-                              '../small_flower_dataset/')
+                              'small_flower_dataset/')
 
 
 def task_2():
@@ -26,9 +30,9 @@ def task_2():
     """
     # Retrieve MobileNetV2 Data
     base_model = tf.keras.applications.mobilenet_v2.MobileNetV2(
-        input_shape=None,
+        input_shape=(224,224,3),
         alpha=1.0,
-        # include_top=False,
+        include_top=True,
         weights='imagenet',
         input_tensor=None,
         pooling=None,
@@ -38,6 +42,7 @@ def task_2():
 
     # Freeze the base_model
     base_model.trainable = False
+    base_model.summary()
 
     return base_model
 
@@ -47,41 +52,27 @@ def task_3(base_model):
     Replace the last layer with a Dense layer of the appropriate shape given that there are 5
     classes in the small flower dataset.
     """
-    inputs = keras.Input(shape=(224, 224, 5))
-    # Change base_model to run in inference mode
-    x = base_model(inputs, training=False)
-    # Convert features of shape `base_model.output_shape[1:]` to vectors
-    x = keras.layers.GlobalAveragePooling2D()(x)
-    outputs = keras.layers.Dense(5)(x)
-    model = keras.Model(inputs, outputs)
 
-    return model
+    new_predictions = keras.layers.Dense(5)(base_model.layers[-2].output)
+    new_model = keras.Model(inputs = base_model.inputs, outputs = new_predictions)
+
+    new_model.summary()
+
+    return new_model
 
 
-def task_4(file):
+def task_4():
     """
     Prepare your training, validation and test sets.
     Takes the individual image and prepares it by resizing and RGB scaling it for keras
     """
-    # MobileNet expects 224x224 image sizes
-    img = image.load_img(image_path + file, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    # Processes images by scaling image RGB values
-    img_array_expanded_dims = np.expand_dims(img_array, axis=0)
-
-    return tf.keras.applications.mobilenet_v2.preprocess_input(img_array_expanded_dims)
-
-
-def task_5(model):
-    """
-    Compile and train your model with an SGD3
-    optimizer using the following parameters
-    learning_rate=0.01, momentum=0.0, nesterov=False.
-    """
-
     pictures = ()  # All images
     categories = []  # Type of flower
     qty = 0  # Quantity of images in each folder
+    qty_class = 0
+
+    x_data = np.empty((1000,224,224,3))
+    y_data = np.empty(1000, dtype=np.float32)
 
     # Record the different groups
     for path, subdirs, files in os.walk(image_path):
@@ -94,35 +85,61 @@ def task_5(model):
             temp_tuple = (file, 'null')
             pictures += temp_tuple
             pictures = pictures[:-1]  # Remove null
-            qty += 1
 
         # Cycle through all of the pictures
         for picture in pictures:
             file = category + "/" + picture
 
-            preprocessed_image = task_4(file)
-            predictions = model.predict(preprocessed_image)
-            # Returns top 5 predictions
-            results = imagenet_utils.decode_predictions(predictions)
+            # MobileNet expects 224x224 image sizes
+            img = image.load_img(image_path + file, target_size=(224, 224))
+            img_array = image.img_to_array(img)
 
-            print(results)
+            # Processes images by scaling image RGB values
+            img_array_expanded_dims = np.expand_dims(img_array, axis=0)
 
+            #--------------------------------------------------------------
+            y_data[qty] = qty_class
+            x_data[qty] = img_array_expanded_dims
+            qty += 1
+        qty_class += 1
         pictures = ()
 
-        # model.compile(optimizer=keras.optimizers.Adam(),
-        #               loss=keras.losses.BinaryCrossentropy(
-        #                   from_logits=True),
-        #               metrics=[keras.metrics.BinaryAccuracy()])
+    x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.4, random_state=1)
+    x_test, x_val, y_test, y_val = train_test_split(x_test, y_test, test_size=0.5, random_state=1)
+    
+    # print(x_data.shape())
+    # print(y_data.shape())
+    # MobileNet expects 224x224 image sizes
+    # img = image.load_img(image_path + file, target_size=(224, 224))
+    # img_array = image.img_to_array(img)
 
-        # model.fit(preprocessed_image, epochs=20,
-        #           callbacks=..., validation_data=...)
+    # # Processes images by scaling image RGB values
+    # img_array_expanded_dims = np.expand_dims(img_array, axis=0)
+
+    return x_train, x_test, x_val, y_train, y_test, y_val
 
 
-def task_6():
+def task_5(model, x_train, x_test, x_val, y_train, y_test, y_val):
+    """
+    Compile and train your model with an SGD3
+    optimizer using the following parameters
+    learning_rate=0.01, momentum=0.0, nesterov=False.
+    """
+
+    # model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.01, momentum=0.0, nesterov = False), loss=None)
+    model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.01, momentum=0.0, nesterov = False),
+              loss='sparse_categorical_crossentropy')
+
+
+    model.fit(x_val, y_val, epochs = 10)
+
+
+def task_6(model, x_train, x_test, x_val, y_train, y_test, y_val):
     """
     Plot the training and validation errors vs time as well as the training and validation
     accuracies.
     """
+    
     # plt.plot()
 
 
@@ -149,11 +166,26 @@ if __name__ == "__main__":
     print("Flower Classifier by Jarryd Stringfellow and Chase Dart")
     print("========================================================")
 
+    print("\n---Start of Task 1:---\n")
     task_1()
+    print("\n---End of Task 1:---\n")
+
+    print("\n---Start of Task 2:---\n")
     base_model = task_2()
-    # model = task_3(base_model)
-    # task_4() # Called from within task_5()
-    task_5(base_model)  # Change to model to use task_3
-    task_6()
-    task_7()
-    task_8()
+    print("\n---End of Task 2:---\n")
+
+    print("\n---Start of Task 3:---\n")
+    model = task_3(base_model)
+    print("\n---End of Task 3:---\n")
+
+    print("\n---Start of Task 4:---\n")
+    x_train, x_test, x_val, y_train, y_test, y_val = task_4() # Called from within task_5()
+    print("\n---End of Task 4:---\n")
+
+    print("\n---Start of Task 5:---\n")
+    task_5(model, x_train, x_test, x_val, y_train, y_test, y_val)  # Change to model to use task_3
+    print("\n---End of Task 5:---\n")
+
+    task_6(model, x_train, x_test, x_val, y_train, y_test, y_val)
+    # task_7()
+    # task_8()
