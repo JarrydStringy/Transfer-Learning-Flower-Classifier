@@ -154,14 +154,13 @@ def task_5(model, x_train, x_test, x_val, y_train, y_test, y_val):
     optimizer using the following parameters
     learning_rate=0.01, momentum=0.0, nesterov=False.
     """
-    model
     # model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.01, momentum=0.0, nesterov = False), loss=None)
     model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.00001, momentum=0.0, nesterov = False),
               loss= 'categorical_crossentropy',
               metrics=['accuracy'])     #sparse_categorical_crossentropy
 
     
-    history = new_model.fit(x_train, y_train, epochs = 100) #validation_data=(x_test, y_test), 
+    history = model.fit(x_train, y_train, epochs = 40) #validation_data=(x_test, y_test), 
     return history
 
 def task_6(history, model, x_train, x_test, x_val, y_train, y_test, y_val):
@@ -270,30 +269,26 @@ def task_8(history1, history2, history3, model, x_train, x_test, x_val, y_train,
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    plt.legend(['lr 0.001'], loc='upper left')
     plt.plot(history2.history['accuracy'])
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    plt.legend(['lr 0.00001'], loc='upper left')
     plt.plot(history3.history['accuracy'])
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    plt.legend(['lr 0.0000001'], loc='upper left')
+    plt.legend(['lr 0.001', 'lr 0.0001','lr 0.00001'], loc='upper left')
 
     plt.subplot(1,2,2)
     plt.plot(history1.history['loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['lr 0.001'], loc='upper left')
     plt.plot(history2.history['loss'])
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['lr 0.00001'], loc='upper left')
     plt.plot(history3.history['loss'])
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['lr 0.0000001'], loc='upper left')
+    plt.legend(['lr 0.001', 'lr 0.0001','lr 0.00001'], loc='upper left')
 
 
 
