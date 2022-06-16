@@ -271,21 +271,21 @@ def task_7(model, x_train, x_test, x_val, y_train, y_test, y_val):
                   metrics=['accuracy'])  # sparse_categorical_crossentropy
 
     # validation_data=(x_test, y_test),
-    history_lr1 = model.fit(x_train, y_train, epochs=5)
+    history_lr1 = model.fit(x_train, y_train, epochs=10)
 
     model.compile(optimizer=keras.optimizers.SGD(learning_rate=0.0001, momentum=0.0, nesterov=False),
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])  # sparse_categorical_crossentropy
 
     # validation_data=(x_test, y_test),
-    history_lr2 = model.fit(x_train, y_train, epochs=5)
+    history_lr2 = model.fit(x_train, y_train, epochs=10)
 
-    model.compile(optimizer=keras.optimizers.SGD(learning_rate=0.00001, momentum=0.0, nesterov=False),
+    model.compile(optimizer=keras.optimizers.SGD(learning_rate=0.01, momentum=1, nesterov=False),
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])  # sparse_categorical_crossentropy
 
     # validation_data=(x_test, y_test),
-    history_lr3 = model.fit(x_train, y_train, epochs=5)
+    history_lr3 = model.fit(x_train, y_train, epochs=10)
 
     return history_lr1, history_lr2, history_lr3
 
@@ -298,29 +298,36 @@ def task_8(history1, history2, history3, model, x_train, x_test, x_val, y_train,
     """
     plt.subplot(1, 2, 1)
     plt.plot(history1.history['accuracy'])
+    plt.plot(history1.history['val_accuracy'])
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.plot(history2.history['accuracy'])
+    plt.plot(history2.history['val_accuracy'])
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.plot(history3.history['accuracy'])
+    plt.plot(history3.history['val_accuracy'])
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    plt.legend(['lr 0.001', 'lr 0.0001', 'lr 0.00001'], loc='upper left')
+    plt.legend(['Test: lr 0.001', 'Test: lr 0.001', 'Train: lr 0.0001', 'Test: lr 0.0001', 'Train: Momentum 1', 'Test: Momentum 1'], loc='upper left')
 
     plt.subplot(1, 2, 2)
     plt.plot(history1.history['loss'])
+    plt.plot(history1.history['val_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.plot(history2.history['loss'])
+    plt.plot(history2.history['val_loss'])
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.plot(history3.history['loss'])
+    plt.plot(history3.history['val_loss'])
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['lr 0.001', 'lr 0.0001', 'lr 0.00001'], loc='upper left')
+    plt.legend(['Test: lr 0.001', 'Test: lr 0.001', 'Train: lr 0.0001', 'Test: lr 0.0001', 'Train: Momentum 1', 'Test: Momentum 1'], loc='upper left')
+
 
 
 if __name__ == "__main__":
@@ -347,20 +354,20 @@ if __name__ == "__main__":
     x_train, x_test, x_val, y_train, y_test, y_val = task_4()
     print("\n---End of Task 4:---\n")
 
-    print("\n---Start of Task 5:---\n")
-    history = task_5(model, x_train, x_test, x_val, y_train, y_test, y_val)
-    print("\n---End of Task 5:---\n")
+    #print("\n---Start of Task 5:---\n")
+    #history = task_5(model, x_train, x_test, x_val, y_train, y_test, y_val)
+    #print("\n---End of Task 5:---\n")
 
-    print("\n---Start of Task 6:---\n")
-    task_6(history, model, x_train, x_test, x_val, y_train, y_test, y_val)
-    print("\n---End of Task 6:---\n")
+    #print("\n---Start of Task 6:---\n")
+    #task_6(history, model, x_train, x_test, x_val, y_train, y_test, y_val)
+    #print("\n---End of Task 6:---\n")
 
-    # print("\n---Start of Task 7:---\n")
-    # history1, history2, history3 = task_7(model, x_train, x_test, x_val, y_train, y_test, y_val)
-    # print("\n---End of Task 7:---\n")
+    print("\n---Start of Task 7:---\n")
+    history1, history2, history3 = task_7(model, x_train, x_test, x_val, y_train, y_test, y_val)
+    print("\n---End of Task 7:---\n")
 
-    # print("\n---Start of Task 8:---\n")
-    # task_8(history1, history2, history3, model, x_train, x_test, x_val, y_train, y_test, y_val)
-    # print("\n---End of Task 8:---\n")
+    print("\n---Start of Task 8:---\n")
+    task_8(history1, history2, history3, model, x_train, x_test, x_val, y_train, y_test, y_val)
+    print("\n---End of Task 8:---\n")
 
     plt.show()
