@@ -168,22 +168,12 @@ def task_5(model, x_train, x_test, x_val, y_train, y_test, y_val):
     optimizer using the following parameters
     learning_rate=0.01, momentum=0.0, nesterov=False.
     """
-    # model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.01, momentum=0.0, nesterov = False), loss=None)
-<<<<<<< HEAD
     model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.01, momentum=0.0, nesterov = False),
               loss= 'categorical_crossentropy',
               metrics=['accuracy'])     #sparse_categorical_crossentropy
-
     
     history = model.fit(x_train, y_train, epochs = 20, validation_data=(x_test, y_test))
-=======
-    model.compile(optimizer=keras.optimizers.SGD(learning_rate=0.00001, momentum=0.0, nesterov=False),
-                  loss='categorical_crossentropy',
-                  metrics=['accuracy'])  # sparse_categorical_crossentropy
 
-    # validation_data=(x_test, y_test),
-    history = model.fit(x_train, y_train, epochs=40)
->>>>>>> e953790658eb587f05564dec7bdeda8112bbcec7
     return history
 
 
@@ -365,7 +355,6 @@ if __name__ == "__main__":
     task_6(history, model, x_train, x_test, x_val, y_train, y_test, y_val)
     print("\n---End of Task 6:---\n")
 
-<<<<<<< HEAD
     # print("\n---Start of Task 7:---\n")
     # history1, history2, history3 = task_7(model, x_train, x_test, x_val, y_train, y_test, y_val)
     # print("\n---End of Task 7:---\n")
@@ -373,16 +362,5 @@ if __name__ == "__main__":
     # print("\n---Start of Task 8:---\n")
     # task_8(history1, history2, history3, model, x_train, x_test, x_val, y_train, y_test, y_val)
     # print("\n---End of Task 8:---\n")
-=======
-    print("\n---Start of Task 7:---\n")
-    history1, history2, history3 = task_7(
-        model, x_train, x_test, x_val, y_train, y_test, y_val)
-    print("\n---End of Task 7:---\n")
-
-    print("\n---Start of Task 8:---\n")
-    task_8(history1, history2, history3, model, x_train,
-           x_test, x_val, y_train, y_test, y_val)
-    print("\n---End of Task 8:---\n")
->>>>>>> e953790658eb587f05564dec7bdeda8112bbcec7
 
     plt.show()
