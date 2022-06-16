@@ -155,12 +155,12 @@ def task_5(model, x_train, x_test, x_val, y_train, y_test, y_val):
     learning_rate=0.01, momentum=0.0, nesterov=False.
     """
     # model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.01, momentum=0.0, nesterov = False), loss=None)
-    model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.00001, momentum=0.0, nesterov = False),
+    model.compile(optimizer=keras.optimizers.SGD( learning_rate = 0.01, momentum=0.0, nesterov = False),
               loss= 'categorical_crossentropy',
               metrics=['accuracy'])     #sparse_categorical_crossentropy
 
     
-    history = model.fit(x_train, y_train, epochs = 40) #validation_data=(x_test, y_test), 
+    history = model.fit(x_train, y_train, epochs = 20, validation_data=(x_test, y_test))
     return history
 
 def task_6(history, model, x_train, x_test, x_val, y_train, y_test, y_val):
@@ -174,13 +174,15 @@ def task_6(history, model, x_train, x_test, x_val, y_train, y_test, y_val):
 
     plt.subplot(1,2,1)
     plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    plt.legend(['train'], loc='upper left')
+    plt.legend(['train', 'test'], loc='upper left')
 
     plt.subplot(1,2,2)
     plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
@@ -318,20 +320,20 @@ if __name__ == "__main__":
     print("\n---End of Task 4:---\n")
 
     print("\n---Start of Task 5:---\n")
-    # history, new_model = task_5(model, x_train, x_test, x_val, y_train, y_test, y_val)
+    history = task_5(model, x_train, x_test, x_val, y_train, y_test, y_val)
     print("\n---End of Task 5:---\n")
 
     print("\n---Start of Task 6:---\n")
-    # task_6(history, new_model, x_train, x_test, x_val, y_train, y_test, y_val)
+    task_6(history, model, x_train, x_test, x_val, y_train, y_test, y_val)
     print("\n---End of Task 6:---\n")
 
-    print("\n---Start of Task 7:---\n")
-    history1, history2, history3 = task_7(model, x_train, x_test, x_val, y_train, y_test, y_val)
-    print("\n---End of Task 7:---\n")
+    # print("\n---Start of Task 7:---\n")
+    # history1, history2, history3 = task_7(model, x_train, x_test, x_val, y_train, y_test, y_val)
+    # print("\n---End of Task 7:---\n")
 
-    print("\n---Start of Task 8:---\n")
-    task_8(history1, history2, history3, model, x_train, x_test, x_val, y_train, y_test, y_val)
-    print("\n---End of Task 8:---\n")
+    # print("\n---Start of Task 8:---\n")
+    # task_8(history1, history2, history3, model, x_train, x_test, x_val, y_train, y_test, y_val)
+    # print("\n---End of Task 8:---\n")
 
     plt.show()
 
