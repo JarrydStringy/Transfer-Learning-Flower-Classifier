@@ -1,3 +1,12 @@
+"""
+Flower Classifier
+Authors:
+    Jarryd Stringfellow - n9734074
+    Chase Dart - n10171517
+
+This project is a flower classifier that uses transfer learning on a neural
+network trained on the ImageNet dataset
+"""
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import ConfusionMatrixDisplay
 from tensorflow.keras.preprocessing import image
